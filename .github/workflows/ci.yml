@@ -1,0 +1,17 @@
+on: [ push ]
+jobs:
+  build-and-test:
+    uses: Team-One-Pos-Tech/FrameUp.SharedWorkFlows/.github/workflows/build.yml@main
+    with:
+      solution-name: "FrameUp.ProcessService.sln"
+      api-project-name: "FrameUp.ProcessService.Api"
+      sonar-project-key: "Team-One-Pos-Tech_FrameUp.ProcessService"
+    secrets:
+      sonar-token: ${{secrets.SONAR_TOKEN}}
+  
+  docker-setup:
+    needs: build-and-test
+    uses: Team-One-Pos-Tech/FrameUp.SharedWorkFlows/.github/workflows/dockerize.yml@main
+    with:
+      image-name: "team-one-pos-tech/frameup-process-service"
+      api-entrypoint-binary: "FrameUp.ProcessService.Api.dll"
