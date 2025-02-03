@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace FrameUp.ProcessService.Application.Models.Requests;
 
 public record FileDetailsRequest

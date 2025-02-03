@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FrameUp.ProcessService.Application.Contracts;
 using FrameUp.ProcessService.Application.Models.Requests;
 using FrameUp.ProcessService.Application.Models.Response;
+using Microsoft.Extensions.Logging;
 using Minio;
 using Minio.DataModel;
 using Minio.DataModel.Args;
@@ -17,11 +18,13 @@ public class MinioBucketRepository : IFileBucketRepository
 {
     private const string BucketName = "frameup.videos";
 
+    private readonly ILogger<MinioBucketRepository> _logger;
     private readonly IMinioClient _minioClient;
 
-    public MinioBucketRepository(IMinioClient minioClient)
+    public MinioBucketRepository(IMinioClient minioClient, ILogger<MinioBucketRepository> logger)
     {
         _minioClient = minioClient;
+        _logger = logger;
     }
 
     public async Task UploadAsync(UploadFileRequest request)
@@ -46,7 +49,7 @@ public class MinioBucketRepository : IFileBucketRepository
 
     public async Task<DownloadFileResponse> DownloadAsync(DownloadFileRequest request)
     {
-        // Todo: Review and test it! It is too blotted right now!
+        // Todo: Review and test it! It is too bloated right now!
         var bucketList = new ListObjectsArgs().WithBucket(BucketName);
         var objects = _minioClient.ListObjectsEnumAsync(bucketList);
 
@@ -73,8 +76,6 @@ public class MinioBucketRepository : IFileBucketRepository
             
         foreach (var element in elements)
         {
-            await requestStreams[element.ObjectName].FlushAsync();
-            
             response.FileDetails.Add(new FileDetailsRequest
             {
                 ContentStream = requestStreams[element.ObjectName].ToArray(),
@@ -89,6 +90,7 @@ public class MinioBucketRepository : IFileBucketRepository
 
     private async Task UploadFile(Guid orderId, FileDetailsRequest file, Tagging tagging)
     {
+        _logger.LogInformation("Uploading file {fileName} for Order id [{orderId}]", file.Name, orderId);
         var objectName = $"{orderId}/{file.Name}";
 
         var args = new PutObjectArgs()

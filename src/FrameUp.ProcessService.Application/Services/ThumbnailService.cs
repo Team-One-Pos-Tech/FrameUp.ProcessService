@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using FFMpegCore;
 using FFMpegCore.Pipes;
@@ -15,7 +14,7 @@ namespace FrameUp.ProcessService.Application.Services;
 
 public class ThumbnailService : IThumbnailService
 {
-    private ILogger<ThumbnailService> _logger;
+    private readonly ILogger<ThumbnailService> _logger;
     private readonly IZipFileService _zipFileService;
 
     public ThumbnailService(IZipFileService zipFileService, ILogger<ThumbnailService> logger)
