@@ -32,4 +32,14 @@
       <ProjectReference Include="..\..\src\FrameUp.ProcessService.Infra\FrameUp.ProcessService.Infra.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Assets\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Assets\Marvel_DOTNET_CSHARP.mp4">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

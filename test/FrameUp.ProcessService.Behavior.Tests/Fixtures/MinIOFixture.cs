@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using DotNet.Testcontainers.Builders;
 using Minio;
 using Testcontainers.Minio;
 
@@ -14,10 +15,16 @@ public abstract class MinIOFixture
     {
         const string userName = "test-user";
         const string password = "#$Sup3rP4ss123";
+        const int minioPublicPort = 9000;
         
         _minioContainer = new MinioBuilder()
+            .WithImage("quay.io/minio/minio")
             .WithUsername(userName)
             .WithPassword(password)
+            .WithCleanUp(true)
+            .WithWaitStrategy(Wait
+                .ForUnixContainer()
+                .UntilPortIsAvailable(minioPublicPort))
             .Build();
 
         await _minioContainer.StartAsync();
