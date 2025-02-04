@@ -1,36 +1,40 @@
 using System.Threading.Tasks;
 using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Containers;
 using Minio;
-using Testcontainers.Minio;
 
 namespace FrameUp.ProcessService.Behavior.Tests.Fixtures;
 
 public abstract class MinIOFixture
 {
+    private IContainer _minioContainer;
     protected IMinioClient MinioClient;
-    private MinioContainer _minioContainer;
     
     [SetUp]
     protected async Task BaseSetUp()
     {
         const string userName = "test-user";
         const string password = "#$Sup3rP4ss123";
-        const int minioPublicPort = 9000;
+        const int minioServerPublicPort = 9000;
         
-        _minioContainer = new MinioBuilder()
+        _minioContainer = new ContainerBuilder()
             .WithImage("quay.io/minio/minio")
-            .WithUsername(userName)
-            .WithPassword(password)
+            .WithPortBinding(minioServerPublicPort, true)
+            .WithCommand("server", "/data")
+            .WithEnvironment("MINIO_ROOT_USER", userName)
+            .WithEnvironment("MINIO_ROOT_PASSWORD", password)
             .WithCleanUp(true)
             .WithWaitStrategy(Wait
                 .ForUnixContainer()
-                .UntilPortIsAvailable(minioPublicPort))
+                .UntilPortIsAvailable(minioServerPublicPort))
             .Build();
-
+        
         await _minioContainer.StartAsync();
+
+        var minioServerEndpoint = $"{_minioContainer.Hostname}:{_minioContainer.GetMappedPublicPort(minioServerPublicPort)}";
         MinioClient = new MinioClient()
-            .WithEndpoint(_minioContainer.GetConnectionString())
-            .WithCredentials(_minioContainer.GetAccessKey(), _minioContainer.GetSecretKey())
+            .WithEndpoint(minioServerEndpoint)
+            .WithCredentials(userName, password)
             .Build();
     }
 

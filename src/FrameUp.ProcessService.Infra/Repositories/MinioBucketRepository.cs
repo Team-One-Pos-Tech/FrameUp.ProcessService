@@ -66,6 +66,8 @@ public class MinioBucketRepository : IFileBucketRepository
             if(element.Key.EndsWith(".zip"))
                 continue;
             
+            _logger.LogInformation("Preparing to download file {fileName} from bucket {bucket}", element.Key, BucketName);
+            
             requestStreams[element.Key] = new MemoryStream();
 
             var getObjectRequest = new GetObjectArgs()

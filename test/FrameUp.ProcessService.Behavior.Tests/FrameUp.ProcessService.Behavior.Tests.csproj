@@ -19,7 +19,6 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Testcontainers.Minio" Version="4.1.0" />
         <PackageReference Include="Testcontainers.PostgreSql" Version="4.1.0" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
     </ItemGroup>
@@ -39,6 +38,9 @@
     <ItemGroup>
       <None Update="Assets\Marvel_DOTNET_CSHARP.mp4">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\Video.mp4">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 
