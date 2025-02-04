@@ -48,14 +48,6 @@
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
 
-		<Content Include="Dependencies/Windows/ffmpeg.exe" Link="ffmpeg.exe" Condition=" '$(OS)' == 'Windows_NT')))' ">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-
-		<Content Include="Dependencies/Windows/ffprobe.exe" Link="ffprobe.exe" Condition=" '$(OS)' == 'Windows_NT' ">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-
     </ItemGroup>
 
 

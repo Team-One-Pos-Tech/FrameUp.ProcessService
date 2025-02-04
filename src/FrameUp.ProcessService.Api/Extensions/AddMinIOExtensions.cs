@@ -12,6 +12,7 @@ public static class AddMinIOExtensions
         serviceCollection.AddMinio(configureClient => configureClient
             .WithEndpoint(settings.MinIO.Endpoint)
             .WithCredentials(settings.MinIO.AccessKey, settings.MinIO.SecretKey)
+            .WithSSL(false)
             .Build());
 
         return serviceCollection;
