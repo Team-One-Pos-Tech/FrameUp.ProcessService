@@ -7,55 +7,45 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
-        <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="9.0.0" />
-        <PackageReference Include="AspNetCore.HealthChecks.UI" Version="9.0.0" />
-        <PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="9.0.0" />
-        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
-        <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="9.0.0" />
-        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0"/>
+        <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="9.0.0"/>
+        <PackageReference Include="AspNetCore.HealthChecks.UI" Version="9.0.0"/>
+        <PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="9.0.0"/>
+        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0"/>
+        <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
-        <PackageReference Include="Serilog.Sinks.LogBee.AspNetCore" Version="1.0.3" />
-        <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.6" />
-        <PackageReference Include="Minio" Version="6.0.4" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3"/>
+        <PackageReference Include="Serilog.Sinks.LogBee.AspNetCore" Version="1.0.3"/>
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.6"/>
+        <PackageReference Include="Minio" Version="6.0.4"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FrameUp.ProcessService.Application\FrameUp.ProcessService.Application.csproj" />
-        <ProjectReference Include="..\FrameUp.ProcessService.Infra\FrameUp.ProcessService.Infra.csproj" />
+        <ProjectReference Include="..\FrameUp.ProcessService.Application\FrameUp.ProcessService.Application.csproj"/>
+        <ProjectReference Include="..\FrameUp.ProcessService.Infra\FrameUp.ProcessService.Infra.csproj"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-        
-        <Content Include="Dependencies\Linux\ffmpeg" Link="ffmpeg" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
+        <Resource Exclude="Dependencies\Linux\ffmpeg" Include="Dependencies\Linux\ffmpeg" Link="ffmpeg">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
+        </Resource>
 
-        <Content Include="Dependencies\Linux\ffprobe" Link="ffprobe" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
+        <Resource Exclude="Dependencies\Linux\ffprobe" Include="Dependencies\Linux\ffprobe" Link="ffprobe">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
+        </Resource>
 
-        <Content Include="Dependencies\OSX\ffmpeg" Link="ffmpeg" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
+        <!--        <Resource Exclude="Dependencies\OSX\ffmpeg" Include="Dependencies\OSX\ffmpeg" Link="ffmpeg" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'">-->
+        <!--            <CopyToOutputDirectory>Always</CopyToOutputDirectory>-->
+        <!--        </Resource>-->
 
-        <Content Include="Dependencies\OSX\ffprobe" Link="ffprobe" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-
-		<Content Include="Dependencies\Windows\ffmpeg.exe" Link="ffmpeg.exe" Condition=" '$(OS)' == 'Windows_NT' ">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-
-		<Content Include="Dependencies\Windows\ffprobe.exe" Link="ffprobe.exe" Condition=" '$(OS)' == 'Windows_NT' ">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-
+        <!--        <Resource Exclude="Dependencies\OSX\ffprobe" Include="Dependencies\OSX\ffprobe" Link="ffprobe" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'">-->
+        <!--            <CopyToOutputDirectory>Always</CopyToOutputDirectory>-->
+        <!--        </Resource>-->
     </ItemGroup>
 
 
