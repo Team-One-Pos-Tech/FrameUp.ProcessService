@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using FrameUp.ProcessService.Application.Contracts;
@@ -34,7 +35,13 @@ public class VideoReadyToProcessConsumerStepDefinition : MinIOFixture
         _bucketRepository = new MinioBucketRepository(MinioClient, loggerFactory.CreateLogger<MinioBucketRepository>());
 
         var zipService = new ZipFileService();
-        var thumbnailService = new ThumbnailService(zipService, loggerFactory.CreateLogger<ThumbnailService>());
+        
+        var dateTimeFactoryMock = new Mock<IDateTimeFactory>();
+        dateTimeFactoryMock
+            .Setup(px => px.GetCurrentUtcDateTime())
+            .Returns(DateTime.Parse("2025-02-04"));
+        
+        var thumbnailService = new ThumbnailService(loggerFactory.CreateLogger<ThumbnailService>(), zipService, dateTimeFactoryMock.Object);
         _videoReadyToProcessConsumer = new VideoReadyToProcessConsumer(
             loggerFactory.CreateLogger<VideoReadyToProcessConsumer>(), _bucketRepository, thumbnailService);
     }
@@ -78,8 +85,12 @@ public class VideoReadyToProcessConsumerStepDefinition : MinIOFixture
         await _videoReadyToProcessConsumer.Consume(context);
     }
 
-    [Then(@"it should process the video successfully")]
-    public void ThenItShouldProcessTheVideoSuccessfully()
+    [Then(@"it should process the video successfully for order id '(.*)' with name '(.*)'")]
+    public async Task ThenItShouldProcessTheVideoSuccessfullyForOrderIdWithName(Guid orderId, string outputFileName)
     {
+        var downloadFileResponse = await _bucketRepository.DownloadFilesByOrderAndNameAsync(orderId, [outputFileName]);
+        
+        Assert.AreEqual(1, downloadFileResponse.FileDetails.Count);
+        Assert.AreEqual(downloadFileResponse.FileDetails[0].Name, outputFileName);
     }
 }
