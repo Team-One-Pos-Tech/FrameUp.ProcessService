@@ -65,12 +65,12 @@ public class MinioBucketRepository : IFileBucketRepository
         
         await foreach (var element in objects)
         {
-            if(!element.ContentType.StartsWith("video/"))
-                continue;
-            
             if (element.IsDir)
                 continue;
 
+            if(element.Key.EndsWith(".zip"))
+                continue;
+            
             requestStreams[element.Key] = new MemoryStream();
 
             var getObjectRequest = new GetObjectArgs()

@@ -41,7 +41,7 @@ public class ThumbnailService : IThumbnailService
             var snapshots = TakeSnapshotBatchAsync(videoPath, captureInterval, outputImageSize);
             var zipStream = await _zipFileService.ZipFileAsync(snapshots, CancellationToken.None);
             
-            outputFiles.Add($"packages/{DateTime.UtcNow}_snapshots.zip", zipStream);
+            outputFiles.Add($"packages/{DateTime.UtcNow:u}_snapshots.zip", zipStream);
         }
         
         return outputFiles;
