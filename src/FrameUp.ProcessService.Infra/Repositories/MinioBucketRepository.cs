@@ -49,43 +49,62 @@ public class MinioBucketRepository : IFileBucketRepository
 
     public async Task<DownloadFileResponse> DownloadAsync(DownloadFileRequest request)
     {
-        // Todo: Review and test it! It is too bloated right now!
-        var bucketList = new ListObjectsArgs().WithBucket(BucketName);
-        var objects = _minioClient.ListObjectsEnumAsync(bucketList);
+        var objectListAsyncEnumerable = ListAllObjectsAtBucketWithPrefix(request.OrderId.ToString());
+        return await DownloadObjectList(objectListAsyncEnumerable);
+    }
 
-        var requestTasks = new List<Task<ObjectStat>>();
+    private async Task<DownloadFileResponse> DownloadObjectList(IAsyncEnumerable<Item> objectListAsyncEnumerable)
+    {
         var requestStreams = new Dictionary<string, MemoryStream>();
-        
-        await foreach (var element in objects)
+        var objectStats = new List<ObjectStat>();
+
+        await foreach (var element in objectListAsyncEnumerable)
         {
-            if(element.IsDir)
+            if (element.IsDir)
+                continue;
+
+            if(element.Key.EndsWith(".zip"))
                 continue;
             
             requestStreams[element.Key] = new MemoryStream();
-            
+
             var getObjectRequest = new GetObjectArgs()
                 .WithBucket(BucketName)
-                .WithFile(element.Key)
+                .WithObject(element.Key)
                 .WithCallbackStream(stream => stream.CopyTo(requestStreams[element.Key]));
-                
-            requestTasks.Add(_minioClient.GetObjectAsync(getObjectRequest));
+
+            var stats = await _minioClient.GetObjectAsync(getObjectRequest);
+            objectStats.Add(stats);
         }
         
-        var elements = await Task.WhenAll(requestTasks);
         var response = new DownloadFileResponse();
-            
-        foreach (var element in elements)
+
+        foreach (var element in objectStats)
         {
+            var nameWithoutPrefix = element.ObjectName.Remove(0, element.ObjectName.IndexOf('/') + 1);
+            if (string.IsNullOrEmpty(nameWithoutPrefix))
+                nameWithoutPrefix = Guid.NewGuid().ToString();
+            
             response.FileDetails.Add(new FileDetailsRequest
             {
                 ContentStream = requestStreams[element.ObjectName].ToArray(),
                 ContentType = element.ContentType,
-                Name = element.ObjectName,
+                Name = nameWithoutPrefix,
                 Size = element.Size,
             });
         }
         
         return response;
+    }
+
+    private IAsyncEnumerable<Item> ListAllObjectsAtBucketWithPrefix(string orderBucketPrefix)
+    {
+        var bucketList = new ListObjectsArgs()
+            .WithBucket(BucketName)
+            .WithPrefix(orderBucketPrefix)
+            .WithRecursive(true);
+
+        return _minioClient.ListObjectsEnumAsync(bucketList);
     }
 
     private async Task UploadFile(Guid orderId, FileDetailsRequest file, Tagging tagging)

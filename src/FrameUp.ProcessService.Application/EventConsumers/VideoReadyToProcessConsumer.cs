@@ -14,7 +14,10 @@ using Microsoft.Extensions.Logging;
 
 namespace FrameUp.ProcessService.Application.EventConsumers;
 
-public class VideoReadyToProcessConsumer : IConsumer<ReadyToProcessVideo>
+public class VideoReadyToProcessConsumer(
+    ILogger<VideoReadyToProcessConsumer> logger,
+    IFileBucketRepository fileBucketRepository,
+    IThumbnailService thumbnailService) : IConsumer<ReadyToProcessVideo>
 {
     private static readonly IDictionary<ResolutionTypes, Size> Resolutions = new Dictionary<ResolutionTypes, Size>
     {
@@ -24,14 +27,15 @@ public class VideoReadyToProcessConsumer : IConsumer<ReadyToProcessVideo>
         { ResolutionTypes.SD, new Size(640, 480) },
     };
 
-    private readonly ILogger<VideoReadyToProcessConsumer> _logger;
-    
-    private readonly IFileBucketRepository _fileBucketRepository;
-    private readonly IThumbnailService _thumbnailService;
-    
     public async Task Consume(ConsumeContext<ReadyToProcessVideo> context)
     {
         var streamsToProcess = await ListVideoStreamsToProcess(context.Message.OrderId);
+        if (streamsToProcess.Count <= 0)
+        {
+            logger.LogInformation("There are no video streams to process for order with id [{orderId}]", context.Message.OrderId);
+            return;   
+        }
+        
         var zipFiles = await ProcessStreamsIntoZipStreams(context.Message.Parameters, streamsToProcess, context.CancellationToken);
         await UploadZipStreams(context.Message.OrderId, zipFiles);
     }
@@ -42,7 +46,8 @@ public class VideoReadyToProcessConsumer : IConsumer<ReadyToProcessVideo>
         var filesToUpload = zipFiles
             .Select(zipFile => new FileDetailsRequest
             {
-                Name = zipFile.Key, ContentStream = zipFile.Value, 
+                Name = zipFile.Key,
+                ContentStream = zipFile.Value,
                 ContentType = MediaTypeNames.Application.Zip,
                 Size = zipFile.Value.Length,
             });
@@ -53,7 +58,7 @@ public class VideoReadyToProcessConsumer : IConsumer<ReadyToProcessVideo>
             FileDetails = filesToUpload
         };
 
-        await _fileBucketRepository.UploadAsync(uploadRequest);
+        await fileBucketRepository.UploadAsync(uploadRequest);
     }
 
     private async Task<IDictionary<string, byte[]>> ProcessStreamsIntoZipStreams(ProcessVideoParameters parameters, Dictionary<string, byte[]> streamsToProcess, CancellationToken cancellationToken)
@@ -65,7 +70,7 @@ public class VideoReadyToProcessConsumer : IConsumer<ReadyToProcessVideo>
             Videos = streamsToProcess
         };
 
-        var zipFiles = await _thumbnailService.ProcessThumbnailsToAZipStreamAsync(processRequest, cancellationToken);
+        var zipFiles = await thumbnailService.ProcessThumbnailsToAZipStreamAsync(processRequest, cancellationToken);
         return zipFiles;
     }
 
@@ -73,8 +78,8 @@ public class VideoReadyToProcessConsumer : IConsumer<ReadyToProcessVideo>
     {
         try
         {
-            _logger.LogInformation("Preparing to Download video files from Bucket. Order Id [{orderId}]", orderid);
-            var filesToProcess = await _fileBucketRepository.DownloadAsync(new DownloadFileRequest
+            logger.LogInformation("Preparing to Download video files from Bucket. Order Id [{orderId}]", orderid);
+            var filesToProcess = await fileBucketRepository.DownloadAsync(new DownloadFileRequest
             {
                 OrderId = orderid
             });
@@ -82,14 +87,14 @@ public class VideoReadyToProcessConsumer : IConsumer<ReadyToProcessVideo>
             var videos = filesToProcess
                 .FileDetails
                 .ToDictionary(fileDetail => fileDetail.Name, fileDetail => fileDetail.ContentStream);
-            
-            _logger.LogInformation("A total of [{quantity}] videos were downloaded to order id [{orderId}]", videos.Count, orderid);
-            
+
+            logger.LogInformation("A total of [{quantity}] videos were downloaded to order id [{orderId}]", videos.Count, orderid);
+
             return videos;
         }
         catch (Exception exception)
         {
-            _logger.LogError("An exception happens when downloading video files from Bucket for order Id [{orderId}]: [{exception}]", orderid, exception.InnerException);
+            logger.LogError("An exception happens when downloading video files from Bucket for order Id [{orderId}]: [{exception}]", orderid, exception.InnerException);
             throw;
         }
     }

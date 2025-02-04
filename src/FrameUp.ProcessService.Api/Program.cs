@@ -37,6 +37,7 @@ builder.Services
     .AddMassTransit(settings)
     .AddRepositories()
     .AddDatabaseContext(settings)
+    .AddServices()
     .AddMinIO(settings);
 
 var app = builder.Build();
