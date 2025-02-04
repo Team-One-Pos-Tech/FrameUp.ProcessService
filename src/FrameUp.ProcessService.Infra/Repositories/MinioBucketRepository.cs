@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using FrameUp.ProcessService.Application.Contracts;
 using FrameUp.ProcessService.Application.Models.Requests;
 using FrameUp.ProcessService.Application.Models.Response;
@@ -50,20 +49,16 @@ public class MinioBucketRepository : IFileBucketRepository
 
     public async Task<DownloadFileResponse> DownloadAsync(DownloadFileRequest request)
     {
-        // Todo: Review and test it! It is too bloated right now!
-        var bucketList = new ListObjectsArgs()
-            .WithBucket(BucketName)
-            .WithPrefix(request.OrderId.ToString())
-            .WithRecursive(true);
+        var objectListAsyncEnumerable = ListAllObjectsAtBucketWithPrefix(request.OrderId.ToString());
+        return await DownloadObjectList(objectListAsyncEnumerable);
+    }
 
-        var objects = _minioClient
-            .ListObjectsEnumAsync(bucketList);
-        
+    private async Task<DownloadFileResponse> DownloadObjectList(IAsyncEnumerable<Item> objectListAsyncEnumerable)
+    {
         var requestStreams = new Dictionary<string, MemoryStream>();
-
         var objectStats = new List<ObjectStat>();
-        
-        await foreach (var element in objects)
+
+        await foreach (var element in objectListAsyncEnumerable)
         {
             if (element.IsDir)
                 continue;
@@ -86,16 +81,30 @@ public class MinioBucketRepository : IFileBucketRepository
 
         foreach (var element in objectStats)
         {
+            var nameWithoutPrefix = element.ObjectName.Remove(0, element.ObjectName.IndexOf('/') + 1);
+            if (string.IsNullOrEmpty(nameWithoutPrefix))
+                nameWithoutPrefix = Guid.NewGuid().ToString();
+            
             response.FileDetails.Add(new FileDetailsRequest
             {
                 ContentStream = requestStreams[element.ObjectName].ToArray(),
                 ContentType = element.ContentType,
-                Name = element.ObjectName.Replace($"{request.OrderId.ToString()}/", ""),
+                Name = nameWithoutPrefix,
                 Size = element.Size,
             });
         }
-
+        
         return response;
+    }
+
+    private IAsyncEnumerable<Item> ListAllObjectsAtBucketWithPrefix(string orderBucketPrefix)
+    {
+        var bucketList = new ListObjectsArgs()
+            .WithBucket(BucketName)
+            .WithPrefix(orderBucketPrefix)
+            .WithRecursive(true);
+
+        return _minioClient.ListObjectsEnumAsync(bucketList);
     }
 
     private async Task UploadFile(Guid orderId, FileDetailsRequest file, Tagging tagging)

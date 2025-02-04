@@ -31,6 +31,12 @@ public class VideoReadyToProcessConsumer(
     public async Task Consume(ConsumeContext<ReadyToProcessVideo> context)
     {
         var streamsToProcess = await ListVideoStreamsToProcess(context.Message.OrderId);
+        if (streamsToProcess.Count <= 0)
+        {
+            _logger.LogInformation("There are no video streams to process for order with id [{orderId}]", context.Message.OrderId);
+            return;   
+        }
+        
         var zipFiles = await ProcessStreamsIntoZipStreams(context.Message.Parameters, streamsToProcess, context.CancellationToken);
         await UploadZipStreams(context.Message.OrderId, zipFiles);
     }
