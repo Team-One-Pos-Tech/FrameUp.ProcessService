@@ -35,24 +35,13 @@
       <None Update="Assets\Video.mp4">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Assets\Linux\ffmpeg">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\Linux\ffprobe">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
     
-    <ItemGroup>
-        <Resource Include="..\..\src\FrameUp.ProcessService.Api\Dependencies\OSX\ffprobe"  Link="ffmpeg" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Resource>
-
-        <Resource Include="..\..\src\FrameUp.ProcessService.Api\Dependencies\Linux\ffprobe" Link="ffprobe" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Resource>
-
-        <Resource Include="..\..\src\FrameUp.ProcessService.Api\Dependencies\OSX\ffmpeg" Link="ffmpeg" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Resource>
-
-        <Resource Include="..\..\src\FrameUp.ProcessService.Api\Dependencies\OSX\ffprobe" Link="ffprobe" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Resource>
-    </ItemGroup>
 
 </Project>
