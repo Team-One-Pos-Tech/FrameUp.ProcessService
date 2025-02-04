@@ -32,27 +32,27 @@
     
     <ItemGroup>
         
-        <Content Include="Dependencies/Linux/ffmpeg" Link="ffmpeg" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
+        <Content Include="Dependencies\Linux\ffmpeg" Link="ffmpeg" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
 
-        <Content Include="Dependencies/Linux/ffprobe" Link="ffprobe" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
+        <Content Include="Dependencies\Linux\ffprobe" Link="ffprobe" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
 
-        <Content Include="Dependencies/OSX/ffmpeg" Link="ffmpeg" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
+        <Content Include="Dependencies\OSX\ffmpeg" Link="ffmpeg" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
 
-        <Content Include="Dependencies/OSX/ffprobe" Link="ffprobe" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
+        <Content Include="Dependencies\OSX\ffprobe" Link="ffprobe" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
 
-		<Content Include="Dependencies/Windows/ffmpeg.exe" Link="ffmpeg.exe" Condition=" '$(OS)' == 'Windows_NT' ">
+		<Content Include="Dependencies\Windows\ffmpeg.exe" Link="ffmpeg.exe" Condition=" '$(OS)' == 'Windows_NT' ">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 
-		<Content Include="Dependencies/Windows/ffprobe.exe" Link="ffprobe.exe" Condition=" '$(OS)' == 'Windows_NT' ">
+		<Content Include="Dependencies\Windows\ffprobe.exe" Link="ffprobe.exe" Condition=" '$(OS)' == 'Windows_NT' ">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 
