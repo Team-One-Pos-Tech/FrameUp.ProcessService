@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using FrameUp.ProcessService.Application.Contracts;
 using FrameUp.ProcessService.Application.Models.Requests;
 using FrameUp.ProcessService.Application.Models.Response;
@@ -49,31 +50,54 @@ public class MinioBucketRepository : IFileBucketRepository
 
     public async Task<DownloadFileResponse> DownloadAsync(DownloadFileRequest request)
     {
+        var stream = new MemoryStream();
+
+        await _minioClient.GetObjectAsync(
+            new GetObjectArgs()
+            .WithBucket(BucketName)
+            .WithObject($"{request.OrderId.ToString()}/teste (1).mp4")
+            .WithCallbackStream(s => s.CopyTo(stream)));
+
+        return new DownloadFileResponse
+        {
+            FileDetails = [new FileDetailsRequest
+                {
+                    ContentStream = stream.ToArray(),
+                    ContentType = "video/mp4",
+                    Name = "Teste.mp4",
+                    Size = stream.Length
+                }
+            ]
+        };
+
         // Todo: Review and test it! It is too bloated right now!
-        var bucketList = new ListObjectsArgs().WithBucket(BucketName);
+        var bucketList = new ListObjectsArgs()
+            .WithBucket(BucketName)
+            .WithRecursive(true);
+
         var objects = _minioClient.ListObjectsEnumAsync(bucketList);
 
         var requestTasks = new List<Task<ObjectStat>>();
         var requestStreams = new Dictionary<string, MemoryStream>();
-        
+
         await foreach (var element in objects)
         {
-            if(element.IsDir)
+            if (element.IsDir)
                 continue;
-            
+
             requestStreams[element.Key] = new MemoryStream();
-            
+
             var getObjectRequest = new GetObjectArgs()
                 .WithBucket(BucketName)
                 .WithFile(element.Key)
                 .WithCallbackStream(stream => stream.CopyTo(requestStreams[element.Key]));
-                
+
             requestTasks.Add(_minioClient.GetObjectAsync(getObjectRequest));
         }
-        
+
         var elements = await Task.WhenAll(requestTasks);
         var response = new DownloadFileResponse();
-            
+
         foreach (var element in elements)
         {
             response.FileDetails.Add(new FileDetailsRequest
@@ -84,7 +108,7 @@ public class MinioBucketRepository : IFileBucketRepository
                 Size = element.Size,
             });
         }
-        
+
         return response;
     }
 

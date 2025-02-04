@@ -14,7 +14,11 @@ using Microsoft.Extensions.Logging;
 
 namespace FrameUp.ProcessService.Application.EventConsumers;
 
-public class VideoReadyToProcessConsumer : IConsumer<ReadyToProcessVideo>
+public class VideoReadyToProcessConsumer(
+    ILogger<VideoReadyToProcessConsumer> _logger,
+    IFileBucketRepository _fileBucketRepository,
+    IThumbnailService _thumbnailService
+    ) : IConsumer<ReadyToProcessVideo>
 {
     private static readonly IDictionary<ResolutionTypes, Size> Resolutions = new Dictionary<ResolutionTypes, Size>
     {
@@ -24,11 +28,6 @@ public class VideoReadyToProcessConsumer : IConsumer<ReadyToProcessVideo>
         { ResolutionTypes.SD, new Size(640, 480) },
     };
 
-    private readonly ILogger<VideoReadyToProcessConsumer> _logger;
-    
-    private readonly IFileBucketRepository _fileBucketRepository;
-    private readonly IThumbnailService _thumbnailService;
-    
     public async Task Consume(ConsumeContext<ReadyToProcessVideo> context)
     {
         var streamsToProcess = await ListVideoStreamsToProcess(context.Message.OrderId);
@@ -42,7 +41,8 @@ public class VideoReadyToProcessConsumer : IConsumer<ReadyToProcessVideo>
         var filesToUpload = zipFiles
             .Select(zipFile => new FileDetailsRequest
             {
-                Name = zipFile.Key, ContentStream = zipFile.Value, 
+                Name = zipFile.Key,
+                ContentStream = zipFile.Value,
                 ContentType = MediaTypeNames.Application.Zip,
                 Size = zipFile.Value.Length,
             });
@@ -82,9 +82,9 @@ public class VideoReadyToProcessConsumer : IConsumer<ReadyToProcessVideo>
             var videos = filesToProcess
                 .FileDetails
                 .ToDictionary(fileDetail => fileDetail.Name, fileDetail => fileDetail.ContentStream);
-            
+
             _logger.LogInformation("A total of [{quantity}] videos were downloaded to order id [{orderId}]", videos.Count, orderid);
-            
+
             return videos;
         }
         catch (Exception exception)
