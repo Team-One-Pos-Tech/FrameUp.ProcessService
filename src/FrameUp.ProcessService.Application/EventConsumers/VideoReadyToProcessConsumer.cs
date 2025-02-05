@@ -42,7 +42,6 @@ public class VideoReadyToProcessConsumer(
 
     private async Task UploadZipStreams(Guid orderId, IDictionary<string, byte[]> zipFiles)
     {
-        ConsumeContext<ReadyToProcessVideo> context;
         var filesToUpload = zipFiles
             .Select(zipFile => new FileDetailsRequest
             {
