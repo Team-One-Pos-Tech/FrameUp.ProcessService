@@ -37,12 +37,11 @@
       </None>
     </ItemGroup>
 
-
     <ItemGroup>
-        <Content Include="..\..\Dependencies\Linux\ffmpeg" Link="ffmpeg" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'"/>
-        <Content Include="..\..\Dependencies\Linux\ffprobe" Link="ffprobe" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'"/>
-        <Content Include="..\..\Dependencies\OSX\ffmpeg" Link="ffmpeg" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>
-        <Content Include="..\..\Dependencies\OSX\ffprobe" Link="ffprobe" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>
+        <Content Include="..\..\Dependencies\Linux\ffmpeg" Link="ffmpeg" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'"/>
+        <Content Include="..\..\Dependencies\Linux\ffprobe" Link="ffprobe" CCopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'"/>
+        <Content Include="..\..\Dependencies\OSX\ffmpeg" Link="ffmpeg" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>
+        <Content Include="..\..\Dependencies\OSX\ffprobe" Link="ffprobe" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>
     </ItemGroup>
     
 
