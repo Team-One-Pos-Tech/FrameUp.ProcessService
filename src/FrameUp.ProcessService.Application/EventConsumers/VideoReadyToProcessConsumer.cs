@@ -79,10 +79,7 @@ public class VideoReadyToProcessConsumer(
         try
         {
             logger.LogInformation("Preparing to Download video files from Bucket. Order Id [{orderId}]", orderid);
-            var filesToProcess = await fileBucketRepository.DownloadAsync(new DownloadFileRequest
-            {
-                OrderId = orderid
-            });
+            var filesToProcess = await fileBucketRepository.DownloadAllFilesByOrderIdAsync(orderid);
 
             var videos = filesToProcess
                 .FileDetails

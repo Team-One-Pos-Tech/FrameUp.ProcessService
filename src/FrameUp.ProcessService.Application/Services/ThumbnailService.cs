@@ -16,11 +16,13 @@ public class ThumbnailService : IThumbnailService
 {
     private readonly ILogger<ThumbnailService> _logger;
     private readonly IZipFileService _zipFileService;
+    private readonly IDateTimeFactory _dateTimeFactory;
 
-    public ThumbnailService(IZipFileService zipFileService, ILogger<ThumbnailService> logger)
+    public ThumbnailService(ILogger<ThumbnailService> logger, IZipFileService zipFileService, IDateTimeFactory dateTimeFactory)
     {
         _zipFileService = zipFileService;
         _logger = logger;
+        _dateTimeFactory = dateTimeFactory;
     }
 
     public async Task<IDictionary<string, byte[]>> ProcessThumbnailsToAZipStreamAsync(ProcessVideosRequest request, CancellationToken cancellationToken)
@@ -41,7 +43,7 @@ public class ThumbnailService : IThumbnailService
             var snapshots = TakeSnapshotBatchAsync(videoPath, captureInterval, outputImageSize);
             var zipStream = await _zipFileService.ZipFileAsync(snapshots, CancellationToken.None);
             
-            outputFiles.Add($"packages/{DateTime.UtcNow:u}_snapshots.zip", zipStream);
+            outputFiles.Add($"packages/{_dateTimeFactory.GetCurrentUtcDateTime():u}_snapshots.zip", zipStream);
         }
         
         return outputFiles;

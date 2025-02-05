@@ -47,9 +47,47 @@ public class MinioBucketRepository : IFileBucketRepository
         }
     }
 
-    public async Task<DownloadFileResponse> DownloadAsync(DownloadFileRequest request)
+    public async Task<DownloadFileResponse> DownloadFilesByOrderAndNameAsync(Guid orderId, IEnumerable<string> objectNames)
     {
-        var objectListAsyncEnumerable = ListAllObjectsAtBucketWithPrefix(request.OrderId.ToString());
+        var requestStreams = new Dictionary<string, MemoryStream>();
+        var objectStats = new List<ObjectStat>();
+        
+        foreach (var fileName in objectNames)
+        {
+            requestStreams[fileName] = new MemoryStream();
+
+            var getObjectRequest = new GetObjectArgs()
+                .WithBucket(BucketName)
+                .WithObject($"{orderId}/{fileName}")
+                .WithCallbackStream(stream => stream.CopyTo(requestStreams[fileName]));
+            
+            var stats = await _minioClient.GetObjectAsync(getObjectRequest);
+            objectStats.Add(stats);
+        }
+        
+        var response = new DownloadFileResponse();
+
+        foreach (var element in objectStats)
+        {
+            var nameWithoutPrefix = element.ObjectName.Remove(0, element.ObjectName.IndexOf('/') + 1);
+            if (string.IsNullOrEmpty(nameWithoutPrefix))
+                nameWithoutPrefix = Guid.NewGuid().ToString();
+            
+            response.FileDetails.Add(new FileDetailsRequest
+            {
+                ContentStream = requestStreams[nameWithoutPrefix].ToArray(),
+                ContentType = element.ContentType,
+                Name = nameWithoutPrefix,
+                Size = element.Size,
+            });
+        }
+        
+        return response;
+    }
+
+    public async Task<DownloadFileResponse> DownloadAllFilesByOrderIdAsync(Guid orderId)
+    {
+        var objectListAsyncEnumerable = ListAllObjectsAtBucketWithPrefix(orderId.ToString());
         return await DownloadObjectList(objectListAsyncEnumerable);
     }
 
@@ -65,6 +103,8 @@ public class MinioBucketRepository : IFileBucketRepository
 
             if(element.Key.EndsWith(".zip"))
                 continue;
+            
+            _logger.LogInformation("Preparing to download file {fileName} from bucket {bucket}", element.Key, BucketName);
             
             requestStreams[element.Key] = new MemoryStream();
 
