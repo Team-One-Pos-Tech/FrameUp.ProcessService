@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using FrameUp.ProcessService.Application.Contracts;
 using FrameUp.ProcessService.Application.EventConsumers;
@@ -12,10 +10,10 @@ using FrameUp.ProcessService.Behavior.Tests.Fixtures;
 using FrameUp.ProcessService.Domain.Enums;
 using FrameUp.ProcessService.Infra.Repositories;
 using MassTransit;
-using MassTransit.Context;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using NUnit.Framework;
 using Reqnroll;
 
 namespace FrameUp.ProcessService.Behavior.Tests.StepDefinitions;
