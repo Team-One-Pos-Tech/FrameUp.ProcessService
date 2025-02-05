@@ -31,22 +31,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Resource Exclude="Dependencies\Linux\ffmpeg" Include="Dependencies\Linux\ffmpeg"  Link="ffmpeg" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Resource>
-
-        <Resource Exclude="Dependencies\Linux\ffprobe" Include="Dependencies\Linux\ffprobe" Link="ffprobe" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Resource>
-
-        <Resource Exclude="Dependencies\OSX\ffmpeg" Include="Dependencies\OSX\ffmpeg" Link="ffmpeg" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Resource>
-
-        <Resource Exclude="Dependencies\OSX\ffprobe" Include="Dependencies\OSX\ffprobe" Link="ffprobe" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Resource>
+        <Content Include="..\..\Dependencies\Linux\ffmpeg" Link="ffmpeg" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'"/>
+        <Content Include="..\..\Dependencies\Linux\ffprobe" Link="ffprobe" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'"/>
+        <Content Include="..\..\Dependencies\OSX\ffmpeg" Link="ffmpeg" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>
+        <Content Include="..\..\Dependencies\OSX\ffprobe" Link="ffprobe" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>
     </ItemGroup>
-
 
 </Project>
