@@ -2,6 +2,9 @@
 
 The Processing Service is designed to process a video and extract thumbnails based on a given parameters. The video should be previously stored at a Bucket/BlobStorage and it expected to be done by [FrameUp.OrderService](https://github.com/Team-One-Pos-Tech/FrameUp.OrderService)
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Team-One-Pos-Tech_FrameUp.ProcessService&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Team-One-Pos-Tech_FrameUp.ProcessService)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Team-One-Pos-Tech_FrameUp.ProcessService&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Team-One-Pos-Tech_FrameUp.ProcessService)
+
 ## Running the application
 
 ***This project makes use of Shared Workflows***
@@ -36,6 +39,7 @@ sequenceDiagram
     participant FFProbe
     
     OrderService ->> RabbitMq: Publish Order to process event
+    RabbitMq ->> ProcessService: Publish Order to process event
     ProcessService ->> ProcessService: Verify/Validate payload information
     ProcessService ->> MinIo: Request video download
     MinIo ->> ProcessService: Returns video MemoryStream
