@@ -35,14 +35,20 @@
       <None Update="Assets\Video.mp4">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="ffmpeg">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="ffprobe">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
-    <ItemGroup>
-        <Content Include="..\..\Dependencies\Linux\ffmpeg" Link="ffmpeg" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'"/>
-        <Content Include="..\..\Dependencies\Linux\ffprobe" Link="ffprobe" CCopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'"/>
-        <Content Include="..\..\Dependencies\OSX\ffmpeg" Link="ffmpeg" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>
-        <Content Include="..\..\Dependencies\OSX\ffprobe" Link="ffprobe" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>
-    </ItemGroup>
+<!--    <ItemGroup>-->
+<!--        <Content Include="..\..\Dependencies\Linux\ffmpeg" Link="ffmpeg" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'"/>-->
+<!--        <Content Include="..\..\Dependencies\Linux\ffprobe" Link="ffprobe" CCopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'"/>-->
+<!--        <Content Include="..\..\Dependencies\OSX\ffmpeg" Link="ffmpeg" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>-->
+<!--        <Content Include="..\..\Dependencies\OSX\ffprobe" Link="ffprobe" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>-->
+<!--    </ItemGroup>-->
     
 
 </Project>
