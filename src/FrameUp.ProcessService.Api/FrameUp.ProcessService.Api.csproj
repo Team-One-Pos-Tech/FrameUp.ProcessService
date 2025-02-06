@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -34,7 +34,15 @@
         <Content Include="..\..\Dependencies\Linux\ffmpeg" Link="ffmpeg" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'"/>
         <Content Include="..\..\Dependencies\Linux\ffprobe" Link="ffprobe" CCopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'"/>
         <Content Include="..\..\Dependencies\OSX\ffmpeg" Link="ffmpeg" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>
-        <Content Include="..\..\Dependencies\OSX\ffprobe" Link="ffprobe" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>
+		<Content Include="..\..\Dependencies\OSX\ffprobe" Link="ffprobe" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))'"/>
+
+		<Content Include="../../Dependencies/Windows/ffmpeg.exe" Link="ffmpeg.exe" Condition=" '$(OS)' == 'Windows_NT' ">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+
+		<Content Include="../../Dependencies/Windows/ffprobe.exe" Link="ffprobe.exe" Condition=" '$(OS)' == 'Windows_NT' ">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
     </ItemGroup>
 
 </Project>
