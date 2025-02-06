@@ -13,7 +13,6 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using NUnit.Framework;
 using Reqnroll;
 
 namespace FrameUp.ProcessService.Behavior.Tests.StepDefinitions;
@@ -23,6 +22,7 @@ public class VideoReadyToProcessConsumerStepDefinition : MinIOFixture
 {
     private IFileBucketRepository _bucketRepository;
     private VideoReadyToProcessConsumer _videoReadyToProcessConsumer;
+    private Mock<IPublishEndpoint> _publishEndpointMock;
 
     [BeforeScenario]
     public async Task Setup()
@@ -39,9 +39,11 @@ public class VideoReadyToProcessConsumerStepDefinition : MinIOFixture
             .Setup(px => px.GetCurrentUtcDateTime())
             .Returns(DateTime.Parse("2025-02-04"));
         
+        _publishEndpointMock = new Mock<IPublishEndpoint>();
+        
         var thumbnailService = new ThumbnailService(loggerFactory.CreateLogger<ThumbnailService>(), zipService, dateTimeFactoryMock.Object);
         _videoReadyToProcessConsumer = new VideoReadyToProcessConsumer(
-            loggerFactory.CreateLogger<VideoReadyToProcessConsumer>(), _bucketRepository, thumbnailService);
+            loggerFactory.CreateLogger<VideoReadyToProcessConsumer>(), _bucketRepository, thumbnailService, _publishEndpointMock.Object);
     }
 
     [Given("a valid bucket for order id '(.*)' with a video stored")]

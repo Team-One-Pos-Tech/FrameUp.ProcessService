@@ -17,7 +17,8 @@ namespace FrameUp.ProcessService.Application.EventConsumers;
 public class VideoReadyToProcessConsumer(
     ILogger<VideoReadyToProcessConsumer> logger,
     IFileBucketRepository fileBucketRepository,
-    IThumbnailService thumbnailService) : IConsumer<ReadyToProcessVideo>
+    IThumbnailService thumbnailService, 
+    IPublishEndpoint publishEndpoint) : IConsumer<ReadyToProcessVideo>
 {
     private static readonly IDictionary<ResolutionTypes, Size> Resolutions = new Dictionary<ResolutionTypes, Size>
     {
@@ -29,15 +30,39 @@ public class VideoReadyToProcessConsumer(
 
     public async Task Consume(ConsumeContext<ReadyToProcessVideo> context)
     {
+        if (context.Message.Parameters.CaptureInterval <= 0)
+        {
+            logger.LogInformation("Capture interval for order to process [{orderId}] is invalid!", context.Message.OrderId);
+            return;  
+        }
+
         var streamsToProcess = await ListVideoStreamsToProcess(context.Message.OrderId);
         if (streamsToProcess.Count <= 0)
         {
             logger.LogInformation("There are no video streams to process for order with id [{orderId}]", context.Message.OrderId);
             return;   
         }
+
+        await NotifyProcessingOrderAsync(context.Message.OrderId, ProcessingStatus.Processing);
         
-        var zipFiles = await ProcessStreamsIntoZipStreams(context.Message.Parameters, streamsToProcess, context.CancellationToken);
-        await UploadZipStreams(context.Message.OrderId, zipFiles);
+        try
+        {
+            var zipFiles = await ProcessStreamsIntoZipStreams(context.Message.Parameters, streamsToProcess, context.CancellationToken);
+            await UploadZipStreams(context.Message.OrderId, zipFiles);
+            
+            await NotifyProcessingOrderAsync(context.Message.OrderId, ProcessingStatus.Concluded);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError("An error occurred when processingg the order [{orderid}]: [{message}]", context.Message.OrderId, exception.Message);
+            await NotifyProcessingOrderAsync(context.Message.OrderId, ProcessingStatus.Failed);
+        }
+    }
+
+    private async Task NotifyProcessingOrderAsync(Guid orderId, ProcessingStatus status)
+    {
+        var processingEvent = new UpdateOrderStatusEvent(orderId, status);
+        await publishEndpoint.Publish(processingEvent);
     }
 
     private async Task UploadZipStreams(Guid orderId, IDictionary<string, byte[]> zipFiles)
