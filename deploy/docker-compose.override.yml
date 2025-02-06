@@ -1,0 +1,43 @@
+services:
+  frame-up-order-app:
+    environment:
+        Settings__RabbitMQ__ConnectionString: amqp://guest:guest@rabbitmq
+        Settings__PostgreSQL__ConnectionString: Host=frame-up-db;Port=5432;Database=OrderService;Username=postgres;Password=postgres
+        Settings__MinIO__Endpoint: play.min.io
+        Settings__MinIO__AccessKey: KZiVbMtAbJDVxL5CZ5Kv
+        Settings__MinIO__SecretKey: 0NbNFEFgK9e2mu4rHkbLuQK2ViBNkTbxCmR5oenu
+        Settings__Auth__Key: randomlyGeneratedKey12345randomlyGeneratedKey12345randomlyGeneratedKey12345randomlyGeneratedKey12345
+        Settings__Auth__Issuer: FrameUp
+        Settings__Auth__Audience: http://localhost:5276
+        Settings__LogBee__OrganizationId: 8a2de170-dd2c-4bed-b853-bec2ca7bbb5a
+        Settings__LogBee__ApplicationId: bafc28c1-0059-4f9d-b19b-ccb0d7c0beb1
+        Settings__LogBee__ApiUrl: logbee.backend.dev:44088
+        ASPNETCORE_ENVIRONMENT: Development
+        ASPNETCORE_HTTP_PORTS: 8080
+
+  frame-up-process-app:
+    environment:
+        Settings__RabbitMQ__ConnectionString: amqp://guest:guest@rabbitmq
+        Settings__PostgreSQL__ConnectionString: Host=frame-up-db;Port=5432;Database=OrderService;Username=postgres;Password=postgres
+        Settings__MinIO__Endpoint: play.min.io
+        Settings__MinIO__AccessKey: KZiVbMtAbJDVxL5CZ5Kv
+        Settings__MinIO__SecretKey: 0NbNFEFgK9e2mu4rHkbLuQK2ViBNkTbxCmR5oenu
+        ASPNETCORE_ENVIRONMENT: Development
+        ASPNETCORE_HTTP_PORTS: 8080
+        
+  identity-app:
+    environment:
+        RabbitMQ__Host: rabbitmq
+        RabbitMQ__User: guest
+        RabbitMQ__Password: guest
+        Storage__PostgreSQL__Host: frame-up-db
+        Storage__PostgreSQL__User: postgres
+        Storage__PostgreSQL__Password: postgres
+        Storage__PostgreSQL__Database: snack-hub-client
+        ASPNETCORE_ENVIRONMENT: Development
+        ASPNETCORE_HTTP_PORTS: 8080
+        
+  frame-up-db:
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
