@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using FrameUp.ProcessService.Api.Configuration;
+using Microsoft.AspNetCore.Builder;
 using Serilog;
 using Serilog.Sinks.LogBee;
 using Serilog.Sinks.LogBee.AspNetCore;
@@ -8,15 +9,16 @@ namespace FrameUp.ProcessService.Api.Extensions;
 public static class AddLogBeeExtensions
 {
     public static WebApplicationBuilder AddLogBee(
-        this WebApplicationBuilder builder
+        this WebApplicationBuilder builder,
+        Settings settings
     )
     {
         builder.Services.AddSerilog((services, loggerConfiguration) => loggerConfiguration
             .WriteTo
             .LogBee(new LogBeeApiKey(
-                    builder.Configuration["LogBee.OrganizationId"]!,
-                    builder.Configuration["LogBee.ApplicationId"]!,
-                    builder.Configuration["LogBee.ApiUrl"]!),
+                    settings.LogBee.OrganizationId,
+                    settings.LogBee.ApplicationId,
+                    settings.LogBee.ApiUrl),
                 services
             )
             .WriteTo.Console());

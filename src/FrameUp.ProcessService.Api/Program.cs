@@ -20,7 +20,7 @@ builder.Services
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
-builder.AddLogBee()
+builder.AddLogBee(settings)
     .AddCustomHealthChecks(settings);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
