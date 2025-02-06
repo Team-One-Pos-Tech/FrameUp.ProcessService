@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using DotNet.Testcontainers.Builders;
 using FrameUp.ProcessService.Infra.Context;
 using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
 using Testcontainers.PostgreSql;
 
 namespace FrameUp.ProcessService.Behavior.Tests.Fixtures;
