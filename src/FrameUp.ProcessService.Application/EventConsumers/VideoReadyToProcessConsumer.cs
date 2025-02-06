@@ -29,6 +29,12 @@ public class VideoReadyToProcessConsumer(
 
     public async Task Consume(ConsumeContext<ReadyToProcessVideo> context)
     {
+        if (context.Message.Parameters.CaptureInterval <= 0)
+        {
+            logger.LogInformation("Capture interval for order to process [{orderId}] is invalid!", context.Message.OrderId);
+            return;  
+        }
+
         var streamsToProcess = await ListVideoStreamsToProcess(context.Message.OrderId);
         if (streamsToProcess.Count <= 0)
         {
