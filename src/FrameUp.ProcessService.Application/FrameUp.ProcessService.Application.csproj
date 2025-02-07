@@ -21,4 +21,13 @@
       <ProjectReference Include="..\FrameUp.ProcessService.Domain\FrameUp.ProcessService.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="ffmpeg">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="ffprobe">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
