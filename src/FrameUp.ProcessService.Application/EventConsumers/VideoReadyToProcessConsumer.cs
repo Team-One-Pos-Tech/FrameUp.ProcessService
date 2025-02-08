@@ -52,6 +52,8 @@ public class VideoReadyToProcessConsumer(
             var uploadedStreamResponse = await UploadZipStreams(context.Message.OrderId, zipFiles);
 
             await NotifyProcessingOrderAsync(context.Message.OrderId, ProcessingStatus.Concluded, uploadedStreamResponse);
+
+            logger.LogInformation("Order [{orderId}] has been processed successfully", context.Message.OrderId);
         }
         catch (Exception exception)
         {
