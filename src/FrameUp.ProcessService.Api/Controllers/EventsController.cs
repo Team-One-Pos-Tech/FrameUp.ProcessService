@@ -11,8 +11,10 @@ namespace FrameUp.ProcessService.Api.Controllers;
 public class EventsController(IPublishEndpoint publishEndpoint) : ControllerBase
 {
     [HttpPost("Process/{orderId}")]
-    public async Task Post(Guid orderId, ProcessVideoParameters parameters)
+    public async Task<OkResult> Post(Guid orderId, ProcessVideoParameters parameters)
     {
         await publishEndpoint.Publish(new ReadyToProcessVideo(orderId, parameters));
+
+        return Ok();
     }
 }

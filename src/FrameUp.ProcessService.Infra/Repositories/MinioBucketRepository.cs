@@ -27,7 +27,7 @@ public class MinioBucketRepository : IFileBucketRepository
         _logger = logger;
     }
 
-    public async Task UploadAsync(UploadFileRequest request)
+    public async Task<Dictionary<string, string>> UploadAsync(UploadFileRequest request)
     {
         await CreateBucketIfNotExistsAsync();
 
@@ -37,9 +37,17 @@ public class MinioBucketRepository : IFileBucketRepository
             .FileDetails
             .Select(file => UploadFile(request.OrderId, file, tagging));
 
+        var response = new Dictionary<string, string>();
+
         try
         {
-            await Task.WhenAll(uploadTasks);
+            var itens = await Task.WhenAll(uploadTasks);
+            
+            itens.ToDictionary(item => item.fileName, item => item.uri)
+                .ToList()
+                .ForEach(item => response.Add(item.Key, item.Value));
+
+            return response;
         }
         catch (Exception e)
         {
@@ -147,9 +155,10 @@ public class MinioBucketRepository : IFileBucketRepository
         return _minioClient.ListObjectsEnumAsync(bucketList);
     }
 
-    private async Task UploadFile(Guid orderId, FileDetailsRequest file, Tagging tagging)
+    private async Task<(string fileName, string uri)> UploadFile(Guid orderId, FileDetailsRequest file, Tagging tagging)
     {
         _logger.LogInformation("Uploading file {fileName} for Order id [{orderId}]", file.Name, orderId);
+
         var objectName = $"{orderId}/{file.Name}";
 
         var args = new PutObjectArgs()
@@ -161,6 +170,15 @@ public class MinioBucketRepository : IFileBucketRepository
             .WithContentType(file.ContentType);
 
         await _minioClient.PutObjectAsync(args);
+
+        var uri = await _minioClient.PresignedGetObjectAsync(
+            new PresignedGetObjectArgs()
+            .WithBucket(BucketName)
+            .WithObject(objectName)
+            .WithExpiry(604800) // Set expiry to 7 days (604800s)
+            );
+
+        return new(file.Name, uri);
     }
 
     private static Tagging CreateTagging(string orderId)

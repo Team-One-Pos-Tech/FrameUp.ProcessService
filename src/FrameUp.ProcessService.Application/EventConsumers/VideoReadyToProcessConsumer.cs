@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using FrameUp.ProcessService.Application.Contracts;
 using FrameUp.ProcessService.Application.Models.Events;
 using FrameUp.ProcessService.Application.Models.Requests;
+using FrameUp.ProcessService.Application.Models.Response;
 using FrameUp.ProcessService.Domain.Enums;
 using MassTransit;
 using Microsoft.Extensions.Logging;
@@ -17,7 +18,7 @@ namespace FrameUp.ProcessService.Application.EventConsumers;
 public class VideoReadyToProcessConsumer(
     ILogger<VideoReadyToProcessConsumer> logger,
     IFileBucketRepository fileBucketRepository,
-    IThumbnailService thumbnailService, 
+    IThumbnailService thumbnailService,
     IPublishEndpoint publishEndpoint) : IConsumer<ReadyToProcessVideo>
 {
     private static readonly IDictionary<ResolutionTypes, Size> Resolutions = new Dictionary<ResolutionTypes, Size>
@@ -33,24 +34,24 @@ public class VideoReadyToProcessConsumer(
         if (context.Message.Parameters.CaptureInterval <= 0)
         {
             logger.LogInformation("Capture interval for order to process [{orderId}] is invalid!", context.Message.OrderId);
-            return;  
+            return;
         }
 
         var streamsToProcess = await ListVideoStreamsToProcess(context.Message.OrderId);
         if (streamsToProcess.Count <= 0)
         {
             logger.LogInformation("There are no video streams to process for order with id [{orderId}]", context.Message.OrderId);
-            return;   
+            return;
         }
 
         await NotifyProcessingOrderAsync(context.Message.OrderId, ProcessingStatus.Processing);
-        
+
         try
         {
             var zipFiles = await ProcessStreamsIntoZipStreams(context.Message.Parameters, streamsToProcess, context.CancellationToken);
-            await UploadZipStreams(context.Message.OrderId, zipFiles);
-            
-            await NotifyProcessingOrderAsync(context.Message.OrderId, ProcessingStatus.Concluded);
+            var uploadedStreamResponse = await UploadZipStreams(context.Message.OrderId, zipFiles);
+
+            await NotifyProcessingOrderAsync(context.Message.OrderId, ProcessingStatus.Concluded, uploadedStreamResponse);
         }
         catch (Exception exception)
         {
@@ -59,13 +60,22 @@ public class VideoReadyToProcessConsumer(
         }
     }
 
-    private async Task NotifyProcessingOrderAsync(Guid orderId, ProcessingStatus status)
+    private async Task NotifyProcessingOrderAsync(
+        Guid orderId, 
+        ProcessingStatus status, 
+        UploadZipStreamsResponse? uploadedStreamResponse = null)
     {
-        var processingEvent = new UpdateOrderStatusEvent(orderId, status);
+        var uploadedPackagesResponseItems = uploadedStreamResponse != null ?
+                uploadedStreamResponse
+                .Items
+                .Select(item => new UploadedPackageItemResponse(item.FileName, item.Uri)).ToArray() : [];
+
+        var processingEvent = new UpdateOrderStatusEvent(orderId, status, uploadedPackagesResponseItems);
+
         await publishEndpoint.Publish(processingEvent);
     }
 
-    private async Task UploadZipStreams(Guid orderId, IDictionary<string, byte[]> zipFiles)
+    private async Task<UploadZipStreamsResponse> UploadZipStreams(Guid orderId, IDictionary<string, byte[]> zipFiles)
     {
         var filesToUpload = zipFiles
             .Select(zipFile => new FileDetailsRequest
@@ -82,7 +92,12 @@ public class VideoReadyToProcessConsumer(
             FileDetails = filesToUpload
         };
 
-        await fileBucketRepository.UploadAsync(uploadRequest);
+        var response = await fileBucketRepository.UploadAsync(uploadRequest);
+
+        return new UploadZipStreamsResponse
+        {
+            Items = response.Select(fileDetail => new UploadedStreamResponse(fileDetail.Key, fileDetail.Value)).ToArray()
+        };
     }
 
     private async Task<IDictionary<string, byte[]>> ProcessStreamsIntoZipStreams(ProcessVideoParameters parameters, Dictionary<string, byte[]> streamsToProcess, CancellationToken cancellationToken)

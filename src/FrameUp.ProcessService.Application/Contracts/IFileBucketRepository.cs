@@ -8,7 +8,7 @@ namespace FrameUp.ProcessService.Application.Contracts;
 
 public interface IFileBucketRepository
 {
-    Task UploadAsync(UploadFileRequest request);
+    Task<Dictionary<string, string>> UploadAsync(UploadFileRequest request);
     
     Task<DownloadFileResponse> DownloadFilesByOrderAndNameAsync(Guid orderId, IEnumerable<string> objectNames);
     Task<DownloadFileResponse> DownloadAllFilesByOrderIdAsync(Guid orderId);
