@@ -70,7 +70,7 @@ public class VideoReadyToProcessConsumer(
         var uploadedPackagesResponseItems = uploadedStreamResponse != null ?
                 uploadedStreamResponse
                 .Items
-                .Select(item => new UploadedPackageItemResponse(item.FileName, item.Uri)).ToArray() : [];
+                .Select(item => new UploadedPackageItem(item.FileName, item.Uri)).ToArray() : [];
 
         var processingEvent = new UpdateOrderStatusEvent(orderId, status, uploadedPackagesResponseItems);
 

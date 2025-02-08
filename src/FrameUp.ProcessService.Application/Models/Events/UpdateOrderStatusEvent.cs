@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FrameUp.ProcessService.Domain.Enums;
 using MassTransit;
 
@@ -9,7 +10,7 @@ namespace FrameUp.ProcessService.Application.Models.Events;
 public record UpdateOrderStatusEvent(
     Guid OrderId, 
     ProcessingStatus Status,
-    UploadedPackageItemResponse[] ItemResponses
+    UploadedPackageItem[] PackageItems
 );
 
-public record UploadedPackageItemResponse(string FileName, string Uri);
+public record UploadedPackageItem(string FileName, string Uri);
